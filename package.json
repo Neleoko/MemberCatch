@@ -1,0 +1,19 @@
+{
+  "name": "membercatch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord-api-types": "^0.37.0",
+    "@discordjs/rest": "^1.0.1",
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.0.1",
+    "log-timestamp": "^0.3.0"
+  }
+}
