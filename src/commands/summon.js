@@ -15,7 +15,7 @@ module.exports = {
     async execute(interaction) {
         const exampleEmbed = new EmbedBuilder()
             .setColor(0x0099FF)
-            .setAuthor({ iconURL: interaction.user.avatarURL(), name: 'Inventaire de ' + interaction.user.username })
+            .setAuthor({ iconURL: interaction.user.avatarURL(), name: 'Invocation de ' + interaction.user.username })
             .setDescription('Some description here')
             .addFields(
                 { name: 'Regular field title', value: 'Some value here' },

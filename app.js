@@ -5,6 +5,7 @@ const { Client, GatewayIntentBits, Collection, Routes } = require('discord.js');
 const { REST } = require('@discordjs/rest'); // Utiliser pour la diffusion des commandes
 const path = require('path'); // Gérer les liens vers les répertoires
 const fs = require('node:fs'); // Gérer des fichiers
+const { run } = require('./src/Tools/bddConnect'); // Connexion à la base de données
 
 /* Initialisation de notre bot */
 const client = new Client({
@@ -27,6 +28,9 @@ const { eventsHandler } = require('./src/handler/eventsHandler');
 eventsHandler(client); // Lancement des évènements
 reactionsHandler(client); // Lancement des réactions
 const command= commandsHandler(client); // Lancement des commandes
+
+// Connexion à la base de données
+run();
 
 
 // Connexion à notre bot
