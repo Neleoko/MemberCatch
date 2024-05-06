@@ -7,6 +7,12 @@ module.exports = {
     once: false,
     async execute(client, message) {
         let user;
+        console.log(message.type)
+
+        // Ignore les messages de type "7" (messages de type GUILD_MEMBER_JOIN)
+        if (message.type === 7) {
+            return;
+        }
 
         // Vérifiez si le message a été envoyé par un utilisateur et non par un bot
         if (!message.author.bot) {
