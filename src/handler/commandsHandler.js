@@ -8,7 +8,8 @@ function commandsHandler(client) {
     const commandsFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
 
     const commands = []; // Cette variable sera utilisée pour la diffusion de nos commandes sur le ou les serveurs
-
+    console.log()
+    console.log("--------Chargement des commandes--------")
     for (const file of commandsFiles) {
         const filePath = path.join(commandsPath, file); // Récupération du fichier du serveur
         const command = require(filePath); // On charge le fichier
@@ -16,6 +17,7 @@ function commandsHandler(client) {
         client.commands.set(command.data.name, command); // Ajout de la commande dans la collection
         console.log(`Commande ${command.data.name} => chargée`);
     }
+    console.log("----------------------------------------")
     return commands;
 }
 

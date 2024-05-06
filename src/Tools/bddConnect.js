@@ -11,20 +11,41 @@ const client = new MongoClient(uri, {
     }
 });
 
-async function run(query) {
+async function run(collectionName, requestType, data) {
+    let result;
     try {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         // Send a ping to confirm a successful connection
-        await client.db("MemberCatchDS").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
-        return client;
+        await client.db("MemberCatch").command({ ping: 1 });
+
+        switch (requestType) {
+            case "insertOne":
+                await client.db("MemberCatch").collection(collectionName).insertOne(data);
+                break;
+            case "insertMany":
+                await client.db("MemberCatch").collection(collectionName).insertMany(data);
+                break;
+            case "findOne":
+                result = await client.db("MemberCatch").collection(collectionName).findOne(data);
+                break;
+            case "findMany":
+                result = await client.db("MemberCatch").collection(collectionName).find(data);
+                break;
+            case "updateOne":
+                await client.db("MemberCatch").collection(collectionName).updateOne(data.username.id, data);
+                break;
+            default:
+                break;
+        }
+
 
     } finally {
         // Ensures that the client will close when you finish/error
         console.log("Closing the connection");
-        await client.close();
+        await client.close(); 
     }
+    return result;
 }
 
 

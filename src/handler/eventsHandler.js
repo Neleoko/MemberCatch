@@ -6,6 +6,8 @@ function eventsHandler(client){
 
     const eventsFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith('.js'));
 
+    console.log()
+    console.log("--------Chargement des évènements--------")
     for (const file of eventsFiles) {
         const filePath = path.join(eventsPath, file);
         const event = require(filePath);
@@ -15,11 +17,9 @@ function eventsHandler(client){
         } else { // L'évènement peut se produire plusieurs fois
             client.on(event.name, (...args) => event.execute(client, ...args));
         }
-
         console.log(`Évènement ${event.name} => chargée`);
-
     }
-
+    console.log("----------------------------------------")
 }
 
 module.exports = {

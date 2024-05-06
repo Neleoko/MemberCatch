@@ -29,10 +29,6 @@ eventsHandler(client); // Lancement des évènements
 reactionsHandler(client); // Lancement des réactions
 const command= commandsHandler(client); // Lancement des commandes
 
-// Connexion à la base de données
-run();
-
-
 // Connexion à notre bot
 client.login(process.env.TOKEN).then(async () => {
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
