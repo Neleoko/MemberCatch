@@ -11,7 +11,7 @@ const client = new MongoClient(uri, {
     }
 });
 
-async function run(collectionName, requestType, data) {
+async function run(collectionName, requestType, filter, data) {
     let result;
     try {
         // Connect the client to the server	(optional starting in v4.7)
@@ -22,9 +22,11 @@ async function run(collectionName, requestType, data) {
         switch (requestType) {
             case "insertOne":
                 await client.db("MemberCatch").collection(collectionName).insertOne(data);
+                result = data;
                 break;
             case "insertMany":
                 await client.db("MemberCatch").collection(collectionName).insertMany(data);
+                result = data;
                 break;
             case "findOne":
                 result = await client.db("MemberCatch").collection(collectionName).findOne(data);
@@ -33,16 +35,14 @@ async function run(collectionName, requestType, data) {
                 result = await client.db("MemberCatch").collection(collectionName).find(data);
                 break;
             case "updateOne":
-                await client.db("MemberCatch").collection(collectionName).updateOne(data.username.id, data);
+                await client.db("MemberCatch").collection(collectionName).updateOne(filter, data);
                 break;
             default:
                 break;
         }
 
-
     } finally {
         // Ensures that the client will close when you finish/error
-        console.log("Closing the connection");
         await client.close(); 
     }
     return result;
