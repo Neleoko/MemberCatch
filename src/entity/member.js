@@ -162,7 +162,21 @@ const memberSchema = new Schema({
         },
         findByName: function(name) {
             return this.find({ name: name });
-        }
+        },
+        releaseMember: function (member, serveur_id) {
+            const data = {
+                $set: {
+                    capturedBy: null
+                }
+            };
+
+            const filter = {
+                username_id: member.username_id,
+                serveur_id: serveur_id
+            };
+
+            return this.updateOne(filter, data);
+        },
     }
 });
 
