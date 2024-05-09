@@ -25,17 +25,22 @@ module.exports = {
                 memberData = await Member.addNewUser(message); // Ajoute l'utilisateur à la base de données
             }
 
-            const gainXp = Math.floor(Math.random() * 5) + 100; // Gain d'XP aléatoire entre 1 et 5
-            console.log(gainXp)
+            const gainXp = Math.floor(Math.random() * 5) + 10; // Gain d'XP aléatoire entre 1 et 5
             const cumul = memberData.xp + gainXp;
             const neededXp = Member.calculateNextLevelXP(memberData.level);
-            const cmdChannel = message.guild.channels.cache.get(Channel.commandChannel);
+
+            const cmdChannel = message.guild.channels.cache.get(Channel.channelID);
+
             if (cumul >= neededXp) {
                 const newXp = cumul - neededXp; // XP restant après avoir atteint le niveau suivant
                 await Member.updateUserLevel(memberData, true, newXp);
                 const randomCoins = Math.floor(Math.random() * 6) + 10;
                 await Member.addCoins(memberData, randomCoins);
-                cmdChannel.send(`Félicitations <@${memberData.username_id}>, vous avez atteint le niveau ${memberData.level + 1} et obtenu ${randomCoins}🪙 pièces !`);
+                if (cmdChannel){
+                    cmdChannel.send(`Félicitations <@${message.author.id}>, vous avez atteint le niveau ${memberData.level + 1} et obtenu ${randomCoins}🪙 pièces !`);
+                } else {
+                    message.channel.send(`Félicitations <@${message.author.id}>, vous avez atteint le niveau ${memberData.level + 1} et obtenu ${randomCoins}🪙 pièces !`);
+                }
             } else {
                 await Member.updateUserLevel(memberData, false, cumul);
             }
