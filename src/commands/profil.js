@@ -9,7 +9,7 @@ const Member = require('../entity/member');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('profile')
+        .setName('profil')
         .setDescription('Affiche votre profil de membres')
         .addUserOption(option =>
             option.setName('user')

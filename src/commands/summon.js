@@ -35,10 +35,15 @@ module.exports = {
             const timeDifferenceInHours = timeDifference / (1000 * 60 * 60); // convertir en heures
 
             if (timeDifferenceInHours < 1) {
-                return interaction.reply('Vous avez déjà invoqué un membre dans la dernière heure. Veuillez réessayer plus tard.');
+                const timeLeft = 1 - timeDifferenceInHours;
+                const nextSummonTime = new Date(Date.now() + timeLeft * 1000 * 60 * 60); // Convertir le temps restant en millisecondes et l'ajouter au temps actuel
+
+                // Convertir la date en timestamp Unix (nombre de secondes depuis le 1er janvier 1970)
+                const nextSummonTimestamp = Math.floor(nextSummonTime.getTime() / 1000);
+
+                return interaction.reply(`Vous avez déjà invoqué un membre dans la dernière heure. Prochaine invocation possible à <t:${nextSummonTimestamp}:R>.`);
             }
         }
-
         // Met à jour la date de la dernière invocation
         await Member.updateDateLastSummon(interaction.user.id, interaction.guildId);
 
@@ -114,8 +119,12 @@ module.exports = {
 
                         const timeDifferenceInHours = timeDifference / (1000 * 60 * 60); // convertir en heures
 
-                        if (timeDifferenceInHours < 24) {
-                            return interaction.reply('Vous avez déjà attrapé un membre dans les dernières 24 heures. Veuillez réessayer plus tard.');
+                        if (timeDifferenceInHours < 12) {
+                            const timeLeft = Math.floor(24 - timeDifferenceInHours);
+                            const nextCatchTime = new Date(Date.now() + timeLeft * 1000 * 60 * 60);
+
+                            const nextCatchTimestamp = Math.floor(nextCatchTime.getTime() / 1000);
+                            return interaction.reply(`Vous avez déjà attrapé un membre dans les dernières 24 heures. Prochain catch possible dans <t:${nextCatchTimestamp}:R>.`);
                         }
                     }
 

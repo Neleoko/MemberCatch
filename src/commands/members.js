@@ -4,24 +4,19 @@ const {getUserAvatarColor} = require("../utils/nodeVibrant");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('inventory')
-        .setDescription('Affiche l\'inventaire complet de vos membres capturés')
-        .addUserOption(option =>
-        option.setName('user')
-            .setDescription('Utilisateur dont vous voulez afficher l\'inventaire.')),
+        .setName('members')
+        .setDescription('Affiche l\'inventaire complet de tout les membres '),
     async execute(interaction, client) {
 
-        const userId = userOption ? userOption.id : interaction.user.id;
 
         // Récupère tous les membres capturés
         const capturedMembers = await Member.find(
             {
-                capturedBy: userId,
                 serveur_id: interaction.guild.id
             }
-            );
+        );
         if (capturedMembers.length === 0) {
-            return interaction.reply('Aucun membre capturé sur ce profil');
+            return interaction.reply('Aucun membre capturé sur ce serveur.');
         }
 
         let currentIndex = 0;
@@ -65,7 +60,7 @@ module.exports = {
 
 async function setEmbed(embed, capturedMembers, client, currentIndex, totalMembers){
     const memberCaught = await client.users.fetch(capturedMembers.username_id);
-    const memberWasCatch = await client.users.fetch(capturedMembers.capturedBy);
+
     const dominantColor = await getUserAvatarColor(memberCaught.avatarURL({ extension: 'png', dynamic: true }));
 
     embed.setTitle(capturedMembers.username)
@@ -74,11 +69,19 @@ async function setEmbed(embed, capturedMembers, client, currentIndex, totalMembe
             Pièces : ${capturedMembers.coins}🪙\n
         `)
         .setImage(capturedMembers.avatarURL)
-        .setFooter({
+        .setColor(dominantColor);
+
+    if (capturedMembers.capturedBy){
+        const memberWasCatch = await client.users.fetch(capturedMembers.capturedBy);
+        embed.setFooter({
             text: `Capturé par : ${memberWasCatch.username} | ${currentIndex + 1}/${totalMembers}`,
             iconURL: memberWasCatch.avatarURL({ extension: 'png', dynamic: true })
         })
-        .setColor(dominantColor);
+    }else {
+        embed.setFooter({
+            text: `${currentIndex + 1}/${totalMembers}`
+        })
+    }
 
     return embed;
 }
