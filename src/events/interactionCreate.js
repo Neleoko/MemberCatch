@@ -20,7 +20,7 @@ module.exports = {
         /* Commande Slash */
 
         /* Réponse aux réactions */
-        if (interaction.isButton() || interaction.isSelectMenu()) { // Notre réaction est de type button ou menu de sélection
+        if (interaction.isButton() || interaction.isStringSelectMenu()) { // Notre réaction est de type button ou menu de sélection
             if (interaction.message.author.id !== client.user.id) return; // On ne réagit pas à nous même
             const reaction = client.reactions.get(interaction.customId);
             if (!reaction) return;
