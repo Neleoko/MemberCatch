@@ -4,7 +4,7 @@ module.exports = {
     async execute(client) {
         /* Modification du statut de présence */
         client.user.setPresence({
-            activities: [{ name: 'Programmation en cours - Bot Discord' }],
+            activities: [{ name: 'Attrapez tous les membres de votre serveur' }],
             status: 'online',
         });
     },
