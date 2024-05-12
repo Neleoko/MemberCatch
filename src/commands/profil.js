@@ -24,8 +24,7 @@ module.exports = {
         if (memberData) {
             const memberCapturedBy = await Member.getMemberDB(memberData.capturedBy, interaction.guild.id);
             const avatarURL = (userOption || interaction.user).avatarURL({extension: 'png', dynamic: true});
-            getUserAvatarColor(avatarURL).then(async dominantColor => {
-                console.log(dominantColor);
+            await getUserAvatarColor(avatarURL).then(async dominantColor => {
             const embed = new EmbedBuilder()
                 .setColor(dominantColor)
                 .setAuthor({
@@ -37,7 +36,7 @@ module.exports = {
                         XP : ${memberData.xp}/${Member.calculateNextLevelXP(memberData.level)}\n
                         Pièces : ${memberData.coins} 🪙\n
                         `)
-                .setImage((userOption || interaction.user).avatarURL())
+                .setImage(avatarURL)
             if (memberData.capturedBy) {
                 embed.setFooter({
                     text: 'Capturé par ' + memberCapturedBy.username,
