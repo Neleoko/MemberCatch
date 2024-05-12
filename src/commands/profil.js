@@ -22,7 +22,8 @@ module.exports = {
         const memberData = await Member.getMemberDB(userId, interaction.guild.id);
 
         if (memberData) {
-            const memberCapturedBy = await Member.getMemberDB(memberData.capturedBy, interaction.guild.id);
+            const memberCapturedByDS = await interaction.client.users.fetch(memberData.capturedBy);
+            // const memberCapturedBy = await Member.getMemberDB(memberData.capturedBy, interaction.guild.id);
             const avatarURL = (userOption || interaction.user).avatarURL({extension: 'png', dynamic: true});
             await getUserAvatarColor(avatarURL).then(async dominantColor => {
             const embed = new EmbedBuilder()
@@ -39,8 +40,8 @@ module.exports = {
                 .setImage(avatarURL)
             if (memberData.capturedBy) {
                 embed.setFooter({
-                    text: 'Capturé par ' + memberCapturedBy.username,
-                    iconURL: memberCapturedBy.avatarURL
+                    text: 'Capturé par ' + memberCapturedByDS.username,
+                    iconURL: memberCapturedByDS.avatarURL()
                 });
             }
                 await interaction.reply({embeds: [embed]});

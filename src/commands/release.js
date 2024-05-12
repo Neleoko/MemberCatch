@@ -23,6 +23,6 @@ module.exports = {
         await Member.releaseMember(member, interaction.guild.id);
 
         // Envoie une réponse à l'utilisateur
-        interaction.reply(`Vous avez libéré <@${memberToRelease.id}>.`);
+        interaction.reply(`Vous avez libéré <@${memberToRelease.id}>`);
     }
 };

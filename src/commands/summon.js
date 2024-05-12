@@ -18,6 +18,9 @@ module.exports = {
 
         // Récupère un membre aléatoire
         const userSummoned = await Member.getRandomMember(interaction.user.id, interaction.guildId)
+        // Récupère le membre invoqué
+        const userSummonedDS = await client.users.fetch(userSummoned.username_id)
+
         if (!userSummoned) { // Vérifie si le membre a été trouvé
             return interaction.reply('Aucun membre trouvé. Veuillez réessayer plus tard.')
         }
@@ -47,10 +50,9 @@ module.exports = {
         // Met à jour la date de la dernière invocation
         await Member.updateDateLastSummon(interaction.user.id, interaction.guildId);
 
-        // Récupère le membre invoqué
-        const userSummonedDiscord = await client.users.fetch(userSummoned.username_id)
 
-        if (!userSummonedDiscord) { // Vérifie si le membre a été trouvé
+
+        if (!userSummonedDS) { // Vérifie si le membre a été trouvé
             return interaction.reply('Erreur lors de la récupération du membre')
         }
 
@@ -58,21 +60,19 @@ module.exports = {
         if (userSummoned.capturedBy !== null) { // Vérifie si le membre a été capturé
             userFetched = await client.users.fetch(userSummoned.capturedBy) // Récupère le membre qui a capturé le membre invoqué
         }
+        // Récupère la couleur dominante de l'avatar du membre
+        const avatarUrlSummoned = userSummonedDS.avatarURL({ extension: 'png', dynamic: true });
 
         // Crée l'embed de l'invocation
         const embed = new EmbedBuilder()
-            .setAuthor({name: 'Invocation de ' + userSummoned.username })
+            .setAuthor({name: 'Invocation de ' + userSummonedDS.username })
             .addFields(
                 { name: 'Level', value: userSummoned.level.toString() },
                 { name: 'Coin', value: userSummoned.coins.toString() + ' 🪙', inline: true },
             )
-            .setImage(userSummoned.avatarURL)
+            .setImage(avatarUrlSummoned)
 
-
-        // Récupère la couleur dominante de l'avatar du membre
-        const avatarUrl = userSummonedDiscord.avatarURL({ extension: 'png', dynamic: true });
-
-        await getUserAvatarColor(avatarUrl).then((dominantColor) => {
+        await getUserAvatarColor(avatarUrlSummoned).then((dominantColor) => {
             embed.setColor(dominantColor);
         }); // Ajoute la couleur dominante de l'avatar du membre
 
@@ -146,7 +146,7 @@ module.exports = {
                         });
 
                         await interaction.followUp({
-                            content: '<@' + userWhoClicked.id + '> à attrapé le membre : ' + userSummoned.username,
+                            content: '<@' + userWhoClicked.id + '> à attrapé le membre : ' + userSummonedDS.username,
                             components: []
                         });
 

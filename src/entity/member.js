@@ -7,15 +7,7 @@ const memberSchema = new Schema({
         required: true,
         unique: true
     },
-    username: {
-        type: String,
-        required: true,
-    },
     serveur_id: {
-        type: String,
-        required: true
-    },
-    avatarURL: {
         type: String,
         required: true
     },
@@ -77,9 +69,7 @@ const memberSchema = new Schema({
         addNewUser: function (member) {
             const newMember = new this({
                 username_id: member.author.id,
-                username: member.author.username,
                 serveur_id: member.guild.id,
-                avatarURL: member.author.avatarURL(),
             });
             return newMember.save();
         },
