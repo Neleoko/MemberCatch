@@ -10,6 +10,7 @@ module.exports = {
         option.setName('user')
             .setDescription('Utilisateur dont vous voulez afficher l\'inventaire.')),
     async execute(interaction, client) {
+        const userOption = interaction.options.getUser('user');
 
         const userId = userOption ? userOption.id : interaction.user.id;
 
