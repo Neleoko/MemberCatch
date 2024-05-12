@@ -23,24 +23,28 @@ module.exports = {
 
         if (memberData) {
             const memberCapturedBy = await Member.getMemberDB(memberData.capturedBy, interaction.guild.id);
-            const avatarURL = (userOption || interaction.user).avatarURL({ extension: 'png', dynamic: true });
-            getUserAvatarColor(avatarURL).then(dominantColor => {
-                const embed = new EmbedBuilder()
-                    .setColor(dominantColor)
-                    .setAuthor({ iconURL: (userOption || interaction.user).avatarURL(), name: 'Profil de ' + (userOption || interaction.user).username })
-                    .setDescription(`
+            const avatarURL = (userOption || interaction.user).avatarURL({extension: 'png', dynamic: true});
+            getUserAvatarColor(avatarURL).then(async dominantColor => {
+                console.log(dominantColor);
+            const embed = new EmbedBuilder()
+                .setColor(dominantColor)
+                .setAuthor({
+                    iconURL: (userOption || interaction.user).avatarURL(),
+                    name: 'Profil de ' + (userOption || interaction.user).username
+                })
+                .setDescription(`
                         Niveau : ${memberData.level}\n
                         XP : ${memberData.xp}/${Member.calculateNextLevelXP(memberData.level)}\n
-                        Pièces : ${memberData.coins}🪙\n
+                        Pièces : ${memberData.coins} 🪙\n
                         `)
-                    .setImage((userOption || interaction.user).avatarURL())
-
-                if (memberData.capturedBy) {
-                    embed.setFooter({
-                        text: 'Capturé par ' + memberCapturedBy.username ,
-                        iconURL: memberCapturedBy.avatarURL});
-                }
-                interaction.reply({ embeds: [embed] });
+                .setImage((userOption || interaction.user).avatarURL())
+            if (memberData.capturedBy) {
+                embed.setFooter({
+                    text: 'Capturé par ' + memberCapturedBy.username,
+                    iconURL: memberCapturedBy.avatarURL
+                });
+            }
+                await interaction.reply({embeds: [embed]});
             })
         } else {
             interaction.reply("L'utilisateur spécifié n'a pas encore de profil de membre !");
