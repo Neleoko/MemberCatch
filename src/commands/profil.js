@@ -22,7 +22,6 @@ module.exports = {
         const memberData = await Member.getMemberDB(userId, interaction.guild.id);
 
         if (memberData) {
-            const memberCapturedByDS = await interaction.client.users.fetch(memberData.capturedBy);
             // const memberCapturedBy = await Member.getMemberDB(memberData.capturedBy, interaction.guild.id);
             const avatarURL = (userOption || interaction.user).avatarURL({extension: 'png', dynamic: true});
             await getUserAvatarColor(avatarURL).then(async dominantColor => {
@@ -39,6 +38,7 @@ module.exports = {
                         `)
                 .setImage(avatarURL)
             if (memberData.capturedBy) {
+                const memberCapturedByDS = await interaction.client.users.fetch(memberData.capturedBy);
                 embed.setFooter({
                     text: 'Capturé par ' + memberCapturedByDS.username,
                     iconURL: memberCapturedByDS.avatarURL()
