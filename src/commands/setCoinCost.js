@@ -5,11 +5,11 @@ const {SlashCommandBuilder, PermissionsBitField } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('setchannel')
-        .setDescription('Définit le canal pour le leveling')
+        .setName('setcoincost')
+        .setDescription('Définit le prix pour le cout de autorelease')
         .addStringOption(option =>
-            option.setName('idchannel')
-                .setDescription('L\'ID du canal')
+            option.setName('coins')
+                .setDescription('cout en coins')
                 .setRequired(true)),
     async execute(interaction) {
         // Vérifie si l'utilisateur a la permission d'administrateur
@@ -17,13 +17,7 @@ module.exports = {
             return interaction.reply({ content: 'Vous n\'avez pas la permission d\'utiliser cette commande.', ephemeral: true });
         }
 
-        const channelId = interaction.options.getString('idchannel'); // Récupère l'ID du canal
-
-        // Vérifie si le canal existe
-        const channel = interaction.guild.channels.cache.get(channelId);
-        if (!channel) {
-            return interaction.reply({ content: 'Ce canal n\'existe pas.', ephemeral: true });
-        }
+        const coins = interaction.options.getString('coins'); // Récupère l'ID du canal
 
         // Définit l'ID du canal dans le fichier JSON
         fs.readFile(path.join(__dirname, '../serverConf.json'), 'utf8', (err, data) => {
@@ -36,7 +30,7 @@ module.exports = {
             let jsonContent = JSON.parse(data);
 
             // Modifier la valeur de la clé spécifique
-            jsonContent.channel.cmdID = channelId;
+            jsonContent.coinCost = coins;
 
             // Convertir l'objet JavaScript mis à jour en JSON
             let updatedJson = JSON.stringify(jsonContent, null, 4);
@@ -47,7 +41,7 @@ module.exports = {
                     interaction.reply({ content: 'Erreur lors de l\'écriture du fichier.', ephemeral: true });
                     return;
                 }
-                interaction.reply({ content: `Le canal pour le leveling a été défini à ${channel.name}.`, ephemeral: true });
+                interaction.reply({ content: `Le prix de l\'autorelease a été défini à ${coins} coins.`, ephemeral: true });
             });
         });
     },

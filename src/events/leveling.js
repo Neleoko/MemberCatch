@@ -1,7 +1,7 @@
 const XPQueue = require("../utils/XPQueue");
 
 const Member = require('../entity/member');
-const Channel = require('../channel.json'); // Importe le fichier JSON
+const Channel = require('../serverConf.json'); // Importe le fichier JSON
 
 const xpQueue = new XPQueue(5000); // 30 secondes de cooldown entre chaque gain d'XP
 module.exports = {
@@ -25,11 +25,11 @@ module.exports = {
                 memberData = await Member.addNewUser(message); // Ajoute l'utilisateur à la base de données
             }
 
-            const gainXp = Math.floor(Math.random() * 1) + 4; // Génère un nombre aléatoire entre 1 et 5
+            const gainXp = Math.floor(Math.random() * 1) + 100; // Génère un nombre aléatoire entre 1 et 5
             const cumul = memberData.xp + gainXp;
             const neededXp = Member.calculateNextLevelXP(memberData.level);
 
-            const cmdChannel = message.guild.channels.cache.get(Channel.channelID);
+            const cmdChannel = message.guild.channels.cache.get(Channel.channel.cmdID);
 
             if (cumul >= neededXp) {
                 const newXp = cumul - neededXp; // XP restant après avoir atteint le niveau suivant

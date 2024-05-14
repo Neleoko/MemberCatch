@@ -31,11 +31,12 @@ module.exports = {
                     iconURL: (userOption || interaction.user).avatarURL(),
                     name: 'Profil de ' + (userOption || interaction.user).username
                 })
-                .setDescription(`
-                        Niveau : ${memberData.level}\n
-                        XP : ${memberData.xp}/${Member.calculateNextLevelXP(memberData.level)}\n
-                        Pièces : ${memberData.coins} 🪙\n
-                        `)
+                .addFields(
+                    { name: 'Niveau', value: memberData.level.toString() },
+                    { name: 'XP', value: `${memberData.xp}/${Member.calculateNextLevelXP(memberData.level)}` },
+                    { name: 'Pièces', value: `${memberData.coins} 🪙` }
+
+                )
                 .setImage(avatarURL)
             if (memberData.capturedBy) {
                 const memberCapturedByDS = await interaction.client.users.fetch(memberData.capturedBy);

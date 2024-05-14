@@ -1,5 +1,5 @@
 const { model, Schema} = require('mongoose');
-const levelSettings = require('../levelSettings.json');
+const serverConf = require('../serverConf.json');
 
 const memberSchema = new Schema({
     username_id: {
@@ -64,7 +64,7 @@ const memberSchema = new Schema({
             return result[0];
         },
         calculateNextLevelXP: function(currentLevel) {
-            return Math.floor(levelSettings.baseXP * Math.pow(levelSettings.ratio, currentLevel)); // XP nécessaire pour atteindre le niveau suivant
+            return Math.floor(serverConf.level.baseXP * Math.pow(serverConf.level.ratio, currentLevel)); // XP nécessaire pour atteindre le niveau suivant
         },
         addNewUser: function (member) {
             const newMember = new this({

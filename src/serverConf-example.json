@@ -1,0 +1,10 @@
+{
+    "channel": {
+        "cmdID": null
+    },
+    "coinCost": null,
+    "level": {
+        "baseXP": 100,
+        "ratio": 1.1
+    }
+}
