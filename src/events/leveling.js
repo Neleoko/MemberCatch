@@ -25,7 +25,7 @@ module.exports = {
                 memberData = await Member.addNewUser(message); // Ajoute l'utilisateur à la base de données
             }
 
-            const gainXp = Math.floor(Math.random() * 1) + 100; // Génère un nombre aléatoire entre 1 et 5
+            const gainXp = Math.floor(Math.random() * 1) + 5; // Génère un nombre aléatoire entre 1 et 5
             const cumul = memberData.xp + gainXp;
             const neededXp = Member.calculateNextLevelXP(memberData.level);
 
