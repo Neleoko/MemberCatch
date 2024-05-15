@@ -3,10 +3,6 @@ require('dotenv').config(); // Lire le fichier .env
 
 const { Client, GatewayIntentBits, Collection, Routes } = require('discord.js'); // Utiliser les éléments de Discord
 const { REST } = require('@discordjs/rest'); // Utiliser pour la diffusion des commandes
-const path = require('path'); // Gérer les liens vers les répertoires
-const fs = require('node:fs'); // Gérer des fichiers
-const mongoose = require('mongoose'); // Utiliser pour la base de données
-const Member = require('./src/entity/member'); // Utiliser pour la base de données
 const bdd = require('./src/tools/bddConnect')
 
 /* Initialisation de notre bot */

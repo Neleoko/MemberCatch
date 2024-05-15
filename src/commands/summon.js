@@ -27,7 +27,7 @@ module.exports = {
 
         const userWhoSummoned = await Member.getMemberDB(interaction.user.id, interaction.guildId)
         if (!userWhoSummoned) { // Vérifie si le membre a été trouvé
-            return interaction.reply('Erreur lors de la récupération de votre profil')
+            return interaction.reply('Vous ne possédez pas de profil.')
         }
 
         if (userWhoSummoned.lastSummon) {

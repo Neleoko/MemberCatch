@@ -14,6 +14,10 @@ module.exports = {
         // Récupérer le membre avec qui échanger
         const memberTradeWith = interaction.options.getMember('input');
 
+        if (await Member.getMemberDB(interaction.user.id, interaction.guild.id) === null) {
+            return await interaction.reply({ content: `Vous n'avez pas de profil.`, ephemeral: true });
+        }
+
         if (memberTradeWith === null) {
             await interaction.reply({ content: `Le membre n'est pas sur le serveur.`, ephemeral: true });
             return;
@@ -30,7 +34,6 @@ module.exports = {
         const allMembers = await interaction.guild.members.fetch();
         let member1 = null;
         let response = null;
-
 
         while (!member1) { // Tant que le membre n'est pas trouvé
             try {

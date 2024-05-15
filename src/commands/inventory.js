@@ -70,6 +70,11 @@ async function setEmbed(embed, memberCaughtDB, client, currentIndex, totalMember
     const dominantColor = await getUserAvatarColor(memberCaughtDS.avatarURL({ extension: 'png', dynamic: true }));
 
     embed.setTitle(memberCaughtDS.username)
+        .addFields(
+            { name: 'Niveau', value: memberCaughtDB.level.toString() },
+            { name: 'Pièces', value: `${memberCaughtDB.coins} 🪙` }
+
+        )
         .setDescription(`
             Niveau : ${memberCaughtDB.level}\n
             Pièces : ${memberCaughtDB.coins} 🪙\n

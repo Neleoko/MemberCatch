@@ -19,6 +19,9 @@ module.exports = {
 
         // Vérifie si l'utilisateur a capturé le membre
         const member = await Member.getMemberDB(memberToRelease.id, interaction.guild.id);
+        if (member == null) {
+            return interaction.reply('Ce membre n\'a pas de profil.');
+        }
         if (member.capturedBy == null) {
             return interaction.reply('Ce membre n\'est pas capturé.');
         }
@@ -26,6 +29,6 @@ module.exports = {
         await Member.releaseMember(member, interaction.guild.id);
 
         // Envoie une réponse à l'utilisateur
-        interaction.reply(`Vous avez libéré <@${memberToRelease.id}> qui était capturé par <@${member.capturedBy}>.`);
+        interaction.reply(`Vous avez libéré <@${memberToRelease.id}> qui était capturé par <@${member.capturedBy}>`);
     }
 };

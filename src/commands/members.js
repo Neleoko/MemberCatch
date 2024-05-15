@@ -10,19 +10,19 @@ module.exports = {
 
 
         // Récupère tous les membres capturés
-        const capturedMembersDB = await Member.find(
+        const members = await Member.find(
             {
                 serveur_id: interaction.guild.id
             }
         );
-        if (capturedMembersDB.length === 0) {
+        if (members.length === 0) {
             return interaction.reply('Aucun membre capturé sur ce serveur.');
         }
 
         let currentIndex = 0;
         let embed = new EmbedBuilder();
 
-        embed = await setEmbed(embed, capturedMembersDB[currentIndex], client, currentIndex, capturedMembersDB.length);
+        embed = await setEmbed(embed, members[currentIndex], client, currentIndex, members.length);
 
         const actionRow = new ActionRowBuilder()
             .addComponents(
@@ -43,11 +43,11 @@ module.exports = {
 
         collector.on('collect', async (interaction) => {
             if (interaction.customId === 'previous') {
-                currentIndex = (currentIndex - 1 + capturedMembersDB.length) % capturedMembersDB.length;
+                currentIndex = (currentIndex - 1 + members.length) % members.length;
             } else if (interaction.customId === 'next') {
-                currentIndex = (currentIndex + 1) % capturedMembersDB.length;
+                currentIndex = (currentIndex + 1) % members.length;
             }
-            embed = await setEmbed(embed, capturedMembersDB[currentIndex], client, currentIndex, capturedMembersDB.length);
+            embed = await setEmbed(embed, members[currentIndex], client, currentIndex, members.length);
             await interaction.update({ embeds: [embed], components: [actionRow] });
         });
         collector.on('end', () => {
@@ -58,21 +58,22 @@ module.exports = {
 };
 
 
-async function setEmbed(embed, memberCaughtDB, client, currentIndex, totalMembers){
-    const memberCaughtDS = await client.users.fetch(memberCaughtDB.username_id);
+async function setEmbed(embed, member, client, currentIndex, totalMembers){
+    const memberCaughtDS = await client.users.fetch(member.username_id);
 
     const dominantColor = await getUserAvatarColor(memberCaughtDS.avatarURL({ extension: 'png', dynamic: true }));
 
     embed.setTitle(memberCaughtDS.username)
-        .setDescription(`
-            Niveau : ${memberCaughtDB.level}\n
-            Pièces : ${memberCaughtDB.coins} 🪙\n
-        `)
+        .addFields(
+            { name: 'Niveau', value: member.level.toString() },
+            { name: 'Pièces', value: `${member.coins} 🪙` }
+
+        )
         .setImage(memberCaughtDS.avatarURL())
         .setColor(dominantColor);
 
-    if (memberCaughtDB.capturedBy){
-        const memberWasCatchDS = await client.users.fetch(memberCaughtDB.capturedBy);
+    if (member.capturedBy){
+        const memberWasCatchDS = await client.users.fetch(member.capturedBy);
         embed.setFooter({
             text: `Capturé par : ${memberWasCatchDS.username} | ${currentIndex + 1}/${totalMembers}`,
             iconURL: memberWasCatchDS.avatarURL({ extension: 'png', dynamic: true })

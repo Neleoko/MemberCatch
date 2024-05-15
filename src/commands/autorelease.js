@@ -12,6 +12,11 @@ module.exports = {
         // Vérifie si l'utilisateur a capturé le membre
         const memberDB = await Member.getMemberDB(interaction.user.id, interaction.guild.id);
 
+        if (memberDB === null) {
+            await interaction.reply({content:`Vous n\'etes pas enregistré.`, ephemeral: true});
+            return;
+        }
+
         if (memberDB.capturedBy == null) {
             await interaction.reply({
                     content:`Vous n\'etes pas capturé.`,

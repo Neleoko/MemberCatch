@@ -15,6 +15,9 @@ module.exports = {
 
         // Vérifie si l'utilisateur a capturé le membre
         const member = await Member.getMemberDB(memberToRelease.id, interaction.guild.id);
+        if (!await Member.getMemberDB(interaction.user.id, interaction.guild.id)) {
+            return interaction.reply({ content: 'Vous ne possédez pas de profil.', ephemeral: true });
+        }
         if (member.capturedBy !== interaction.user.id) {
             return interaction.reply('Vous ne possédez pas ce membre.');
         }
