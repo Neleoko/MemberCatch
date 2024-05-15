@@ -145,8 +145,18 @@ const memberSchema = new Schema({
 
             return this.updateOne(filter, data);
         },
-        updateMember: function (member, data) {
-            const filter = { username_id: member.username_id };
+        updateCapturedBy: function (memberID, capturedBy, serveur_id) {
+            console.log('capturedBy', capturedBy)
+            console.log('member', memberID)
+            const filter = {
+                username_id: memberID,
+                serveur_id: serveur_id
+            };
+            const data = {
+                $set: {
+                    capturedBy: capturedBy
+                }
+            };
 
             return this.updateOne(filter, data);
         },
