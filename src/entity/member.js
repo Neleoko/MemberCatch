@@ -4,8 +4,7 @@ const serverConf = require('../serverConf.json');
 const memberSchema = new Schema({
     username_id: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     serveur_id: {
         type: String,
