@@ -18,12 +18,13 @@ module.exports = {
 
         // Récupère un membre aléatoire
         const userSummoned = await Member.getRandomMember(interaction.user.id, interaction.guildId)
-        // Récupère le membre invoqué
-        const userSummonedDS = await client.users.fetch(userSummoned.username_id)
 
         if (!userSummoned) { // Vérifie si le membre a été trouvé
             return interaction.reply('Aucun membre trouvé. Veuillez réessayer plus tard.')
         }
+
+        // Récupère le membre invoqué
+        const userSummonedDS = await client.users.fetch(userSummoned.username_id)
 
         const userWhoSummoned = await Member.getMemberDB(interaction.user.id, interaction.guildId)
         if (!userWhoSummoned) { // Vérifie si le membre a été trouvé
@@ -131,7 +132,7 @@ module.exports = {
                     // Indiquez qu'une interaction est en cours de traitement
                     isProcessing = true;
 
-                    const caught = Member.catchMember(userSummoned, userWhoClicked)
+                    const caught = Member.catchMember(userSummoned, userWhoClicked, interaction.guild.id)
 
                     if (caught) {
                         await interaction.update({

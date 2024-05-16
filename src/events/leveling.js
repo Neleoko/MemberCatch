@@ -16,11 +16,13 @@ module.exports = {
         // Vérifiez si le message a été envoyé par un utilisateur et non par un bot
         if (!message.author.bot) {
             let memberData;
+            let guildData;
             if (!xpQueue.canGetXP(message.author.id)) {
                 return;
             }
+            guildData = message.guild
 
-            memberData = await Member.getMemberDB(message.author.id, message.guild.id); // Récupère les données de l'utilisateur
+            memberData = await Member.getMemberDB(message.author.id, guildData.id); // Récupère les données de l'utilisateur
             if (!memberData) { // Si l'utilisateur n'existe pas dans la base de données
                 memberData = await Member.addNewUser(message); // Ajoute l'utilisateur à la base de données
             }
@@ -31,18 +33,18 @@ module.exports = {
 
             const cmdChannel = message.guild.channels.cache.get(Channel.channel.cmdID);
 
-            if (cumul >= neededXp) {
+            if (cumul >= neededXp) { // Si l'utilisateur a atteint le niveau suivant
                 const newXp = cumul - neededXp; // XP restant après avoir atteint le niveau suivant
-                await Member.updateUserLevel(memberData, true, newXp);
+                await Member.updateUserLevel(memberData, true, newXp, guildData.id);
                 const randomCoins = Math.floor(Math.random() * 6) + 10;
-                await Member.addCoins(memberData, randomCoins);
+                await Member.addCoins(memberData, randomCoins, guildData.id);
                 if (cmdChannel){
                     cmdChannel.send(`Félicitations <@${message.author.id}>, vous avez atteint le niveau ${memberData.level + 1} et obtenu ${randomCoins}🪙 pièces !`);
                 } else {
                     message.channel.send(`Félicitations <@${message.author.id}>, vous avez atteint le niveau ${memberData.level + 1} et obtenu ${randomCoins}🪙 pièces !`);
                 }
             } else {
-                await Member.updateUserLevel(memberData, false, cumul);
+                await Member.updateUserLevel(memberData, false, cumul, guildData.id);
             }
             xpQueue.markXPObtained(message.author.id);
         }

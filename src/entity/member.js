@@ -72,18 +72,21 @@ const memberSchema = new Schema({
             });
             return newMember.save();
         },
-        addCoins: function (member, coins) {
+        addCoins: function (member, coins, serveur_id) {
             const data = {
                 $inc: {
                     coins: coins
                 }
             };
 
-            const filter = { username_id: member.username_id };
+            const filter = {
+                username_id: member.username_id,
+                serveur_id: serveur_id
+            };
 
             return this.updateOne(filter, data);
         },
-        catchMember: async function (member, captor) {
+        catchMember: async function (member, captor, serveur_id) {
             const data = {
                 $set: {
                     capturedBy: captor.id
@@ -91,7 +94,8 @@ const memberSchema = new Schema({
             };
 
             const filter = {
-                username_id: member.username_id
+                username_id: member.username_id,
+                serveur_id: serveur_id
             };
 
             return await this.updateOne(filter, data);
@@ -124,9 +128,8 @@ const memberSchema = new Schema({
 
             return this.updateOne(filter, data);
         },
-        updateUserLevel: function (member, lvlUp, newXp) {
+        updateUserLevel: function (member, lvlUp, newXp, serveur_id) {
             let newLevel;
-
             if (lvlUp === true) { // Si l'utilisateur a atteint le niveau suivant
                 newLevel = member.level + 1;
             } else {
@@ -140,13 +143,14 @@ const memberSchema = new Schema({
                 },
             };
 
-            const filter = { username_id: member.username_id };
+            const filter = {
+                username_id: member.username_id,
+                serveur_id: serveur_id
+            };
 
             return this.updateOne(filter, data);
         },
         updateCapturedBy: function (memberID, capturedBy, serveur_id) {
-            console.log('capturedBy', capturedBy)
-            console.log('member', memberID)
             const filter = {
                 username_id: memberID,
                 serveur_id: serveur_id
