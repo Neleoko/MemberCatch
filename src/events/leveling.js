@@ -1,7 +1,8 @@
 const XPQueue = require("../utils/XPQueue");
 
 const Member = require('../entity/member');
-const Channel = require('../serverConf.json'); // Importe le fichier JSON
+const Guild = require('../entity/guild');
+const SettingGuild = require('../entity/settingGuild');
 
 const xpQueue = new XPQueue(5000); // 30 secondes de cooldown entre chaque gain d'XP
 module.exports = {
@@ -22,31 +23,35 @@ module.exports = {
             }
             guildData = message.guild
 
-            memberData = await Member.getMemberDB(message.author.id, guildData.id); // Récupère les données de l'utilisateur
-            if (!memberData) { // Si l'utilisateur n'existe pas dans la base de données
-                memberData = await Member.addNewUser(message); // Ajoute l'utilisateur à la base de données
-            }
+            const guildDB = await Guild.getGuildById(guildData.id);
+            const settingGuild = await SettingGuild.getSettingGuild(guildDB);
 
-            const gainXp = Math.floor(Math.random() * 1) + 5; // Génère un nombre aléatoire entre 1 et 5
+            memberData = await Member.getMemberDB(message.author.id, guildDB); // Récupère les données de l'utilisateur
+
+            const gainXp = Math.floor(Math.random() * 1) + 50; // Génère un nombre aléatoire entre 1 et 5
             const cumul = memberData.xp + gainXp;
-            const neededXp = Member.calculateNextLevelXP(memberData.level);
+            const neededXp = calculateNextLevelXP(memberData.level, settingGuild); // XP nécessaire pour atteindre le niveau suivant
 
-            const cmdChannel = message.guild.channels.cache.get(Channel.channel.cmdID);
+            const cmdChannel = message.guild.channels.cache.get(settingGuild.channelCmd);
 
             if (cumul >= neededXp) { // Si l'utilisateur a atteint le niveau suivant
                 const newXp = cumul - neededXp; // XP restant après avoir atteint le niveau suivant
-                await Member.updateUserLevel(memberData, true, newXp, guildData.id);
+                await Member.updateUserLevel(memberData, true, newXp, guildDB);
                 const randomCoins = Math.floor(Math.random() * 6) + 10;
-                await Member.addCoins(memberData, randomCoins, guildData.id);
+                await Member.addCoins(memberData, randomCoins, guildDB);
                 if (cmdChannel){
                     cmdChannel.send(`Félicitations <@${message.author.id}>, vous avez atteint le niveau ${memberData.level + 1} et obtenu ${randomCoins}🪙 pièces !`);
                 } else {
                     message.channel.send(`Félicitations <@${message.author.id}>, vous avez atteint le niveau ${memberData.level + 1} et obtenu ${randomCoins}🪙 pièces !`);
                 }
             } else {
-                await Member.updateUserLevel(memberData, false, cumul, guildData.id);
+                await Member.updateUserLevel(memberData, false, cumul, guildDB);
             }
             xpQueue.markXPObtained(message.author.id);
         }
     },
 };
+
+function calculateNextLevelXP(currentLevel, settingGuild) {
+    return Math.floor(settingGuild.levelBaseXP * Math.pow(settingGuild.ratioXP, currentLevel)); // XP nécessaire pour atteindre le niveau suivant
+}

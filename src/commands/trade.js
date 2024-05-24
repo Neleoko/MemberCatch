@@ -1,5 +1,6 @@
 const { ButtonStyle, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, EmbedBuilder} = require('discord.js');
 const Member = require('../entity/member');
+const Guild = require('../entity/guild');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -13,10 +14,7 @@ module.exports = {
     async execute(interaction) {
         // Récupérer le membre avec qui échanger
         const memberTradeWith = interaction.options.getMember('input');
-
-        if (await Member.getMemberDB(interaction.user.id, interaction.guild.id) === null) {
-            return await interaction.reply({ content: `Vous n'avez pas de profil.`, ephemeral: true });
-        }
+        const guildDB = await Guild.getGuildById(interaction.guild.id);
 
         if (memberTradeWith === null) {
             await interaction.reply({ content: `Le membre n'est pas sur le serveur.`, ephemeral: true });
@@ -45,10 +43,10 @@ module.exports = {
             }
             member1 = allMembers.find(m => m.user.username === response); // Récupérer le membre
             // Vérifier si le membre existe et si l'utilisateur le possède
-            if (!member1 || await Member.getMemberDB(member1.id, interaction.guild.id) === null) {
+            if (!member1 || await Member.getMemberDB(member1.id, guildDB) === null) {
                 await interaction.followUp({ content: `Le membre ${response} n'existe pas ou n'a pas de profil, veuillez réessayer.` });
                 member1 = null;
-            }else if (!await verifyUserCaughMember(member1, interaction.guild.id, interaction.user)){
+            }else if (!await verifyUserCaughMember(member1, guildDB, interaction.user)){
                 await interaction.followUp({ content: `Vous ne possédez pas ce membre, veuillez réessayer.` });
             }
         }
@@ -69,7 +67,7 @@ module.exports = {
             }
             member2 = allMembers.find(m => m.user.username === response); // Récupérer le membre
             // Vérifier si le membre existe et si l'utilisateur le possède
-            if (!member2 || await Member.getMemberDB(member2.id, interaction.guild.id) === null) {
+            if (!member2 || await Member.getMemberDB(member2.id, guildDB) === null) {
                 await interaction.followUp({ content: `Le membre ${response} n'existe pas ou n'a pas de profil, veuillez réessayer.` });
                 member2 = null;
             }else if (!await verifyUserCaughMember(member2, interaction.guild.id, memberTradeWith)) {
@@ -105,8 +103,8 @@ module.exports = {
             if (i.user.id === interaction.user.id){
                 if (i.customId === 'accept') {
                     try {
-                        await Member.updateCapturedBy(member1.id, memberTradeWith.user.id, interaction.guild.id);
-                        await Member.updateCapturedBy(member2.id, interaction.user.id, interaction.guild.id);
+                        await Member.updateCapturedBy(member1.id, memberTradeWith.user.id, guildDB);
+                        await Member.updateCapturedBy(member2.id, interaction.user.id, guildDB);
                     } catch (e) {
                         console.log(e);
                         return await interaction.followUp({ content: `Une erreur est survenue lors de l'échange.` });;

@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionsBitField} = require('discord.js');
 const Member = require('../entity/member');
+const Guild = require('../entity/guild');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -18,7 +19,8 @@ module.exports = {
         const memberToRelease = interaction.options.getUser('member');
 
         // Vérifie si l'utilisateur a capturé le membre
-        const member = await Member.getMemberDB(memberToRelease.id, interaction.guild.id);
+        const guildDB = await Guild.getGuildById(interaction.guild.id);
+        const member = await Member.getMemberDB(memberToRelease.id, guildDB);
         if (member == null) {
             return interaction.reply('Ce membre n\'a pas de profil.');
         }
@@ -26,7 +28,7 @@ module.exports = {
             return interaction.reply('Ce membre n\'est pas capturé.');
         }
         // Libère le membre
-        await Member.releaseMember(member, interaction.guild.id);
+        await Member.releaseMember(member, guildDB);
 
         // Envoie une réponse à l'utilisateur
         interaction.reply(`Vous avez libéré <@${memberToRelease.id}> qui était capturé par <@${member.capturedBy}>`);

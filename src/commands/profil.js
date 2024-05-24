@@ -6,6 +6,8 @@ const {
 const { getUserAvatarColor } = require('../utils/nodeVibrant');
 
 const Member = require('../entity/member');
+const Guild = require('../entity/guild');
+const SettingGuild = require('../entity/settingGuild');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -18,11 +20,11 @@ module.exports = {
         const userOption = interaction.options.getUser('user');
 
         const userId = userOption ? userOption.id : interaction.user.id;
-
-        const memberData = await Member.getMemberDB(userId, interaction.guild.id);
+        const guildDB = await Guild.getGuildById(interaction.guild.id);
+        const memberData = await Member.getMemberDB(userId, guildDB);
+        const settingGuild = await SettingGuild.getSettingGuild(guildDB);
 
         if (memberData) {
-            // const memberCapturedBy = await Member.getMemberDB(memberData.capturedBy, interaction.guild.id);
             const avatarURL = (userOption || interaction.user).avatarURL({extension: 'png', dynamic: true});
             await getUserAvatarColor(avatarURL).then(async dominantColor => {
             const embed = new EmbedBuilder()
@@ -33,7 +35,7 @@ module.exports = {
                 })
                 .addFields(
                     { name: 'Niveau', value: memberData.level.toString() },
-                    { name: 'XP', value: `${memberData.xp}/${Member.calculateNextLevelXP(memberData.level)}` },
+                    { name: 'XP', value: `${memberData.xp}/${calculateNextLevelXP(memberData.level, settingGuild)}` },
                     { name: 'Pièces', value: `${memberData.coins} 🪙` }
 
                 )
@@ -51,4 +53,8 @@ module.exports = {
             interaction.reply("L'utilisateur spécifié n'a pas encore de profil de membre !");
         }
     }
+}
+
+function calculateNextLevelXP(currentLevel, settingGuild) {
+    return Math.floor(settingGuild.levelBaseXP * Math.pow(settingGuild.ratioXP, currentLevel)); // XP nécessaire pour atteindre le niveau suivant
 }

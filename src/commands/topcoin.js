@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Member = require('../entity/member');
+const Guild = require('../entity/guild');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -8,7 +9,8 @@ module.exports = {
 
     async execute(interaction) {
         // Récupère tous les utilisateurs
-        const allMembers = await Member.find({ serveur_id: interaction.guild.id });
+        const guildDB = await Guild.getGuildById(interaction.guild.id);
+        const allMembers = await Member.getAllMembers(guildDB);
         if (allMembers.length === 0) {
             return interaction.reply('Aucun utilisateur n\'a été trouvé');
         }

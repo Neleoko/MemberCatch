@@ -1,12 +1,11 @@
-
-const fs = require('fs');
-const path = require('path');
+const settingGuild = require("../entity/settingGuild");
+const Guild = require("../entity/guild");
 const {SlashCommandBuilder, PermissionsBitField } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('setcoincost')
-        .setDescription('Définit le prix pour le cout de autorelease')
+        .setDescription('Définit le prix pour le coût de autorelease')
         .addStringOption(option =>
             option.setName('coins')
                 .setDescription('cout en coins')
@@ -19,30 +18,16 @@ module.exports = {
 
         const coins = interaction.options.getString('coins'); // Récupère l'ID du canal
 
-        // Définit l'ID du canal dans le fichier JSON
-        fs.readFile(path.join(__dirname, '../serverConf.json'), 'utf8', (err, data) => {
-            if (err) {
-                console.error('Erreur de lecture du fichier :', err);
-                return;
-            }
+        const guildDB = await Guild.getGuildById(interaction.guildId); // Récupère le serveur
 
-            // Convertir le contenu en objet JavaScript
-            let jsonContent = JSON.parse(data);
+        try {
+            await settingGuild.setCoinCost(guildDB, coins); // Définit le canal pour le leveling
+            interaction.reply({ content: `Le coût pour l'auto release a été défini à ${coins} coins.`, ephemeral: true });
+        } catch (error) {
+            console.error(error);
+            interaction.reply({ content: 'Une erreur s\'est produite lors de la définition du canal pour le leveling.', ephemeral: true });
+        }
 
-            // Modifier la valeur de la clé spécifique
-            jsonContent.coinCost = coins;
 
-            // Convertir l'objet JavaScript mis à jour en JSON
-            let updatedJson = JSON.stringify(jsonContent, null, 4);
-
-            // Écrire les modifications dans le fichier JSON
-            fs.writeFile(path.join(__dirname, '../serverConf.json'), updatedJson, 'utf8', (err) => {
-                if (err) {
-                    interaction.reply({ content: 'Erreur lors de l\'écriture du fichier.', ephemeral: true });
-                    return;
-                }
-                interaction.reply({ content: `Le prix de l\'autorelease a été défini à ${coins} coins.`, ephemeral: true });
-            });
-        });
     },
 };

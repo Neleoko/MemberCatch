@@ -6,6 +6,7 @@ const {
     ActionRowBuilder  } = require("discord.js");
 const {ComponentType} = require("discord-api-types/v10");
 const Member = require('../entity/member');
+const Guild = require('../entity/guild');
 const { getUserAvatarColor } = require('../utils/nodeVibrant');
 
 module.exports = {
@@ -17,7 +18,8 @@ module.exports = {
         let userFetched;
 
         // Récupère un membre aléatoire
-        const userSummoned = await Member.getRandomMember(interaction.user.id, interaction.guildId)
+        const guild = await Guild.getGuildById(interaction.guildId)
+        const userSummoned = await Member.getRandomMember(interaction.user.id, guild)
 
         if (!userSummoned) { // Vérifie si le membre a été trouvé
             return interaction.reply('Aucun membre trouvé. Veuillez réessayer plus tard.')
@@ -26,10 +28,7 @@ module.exports = {
         // Récupère le membre invoqué
         const userSummonedDS = await client.users.fetch(userSummoned.username_id)
 
-        const userWhoSummoned = await Member.getMemberDB(interaction.user.id, interaction.guildId)
-        if (!userWhoSummoned) { // Vérifie si le membre a été trouvé
-            return interaction.reply('Vous ne possédez pas de profil.')
-        }
+        const userWhoSummoned = await Member.getMemberDB(interaction.user.id, guild)
 
         if (userWhoSummoned.lastSummon) {
             const lastSummonDate = new Date(userWhoSummoned.lastSummon);
@@ -49,9 +48,7 @@ module.exports = {
             }
         }
         // Met à jour la date de la dernière invocation
-        await Member.updateDateLastSummon(interaction.user.id, interaction.guildId);
-
-
+        await Member.updateDateLastSummon(interaction.user.id, guild);
 
         if (!userSummonedDS) { // Vérifie si le membre a été trouvé
             return interaction.reply('Erreur lors de la récupération du membre')
@@ -107,7 +104,7 @@ module.exports = {
                 if (interaction.customId === 'catch') {
                     const userWhoClicked = interaction.user;
 
-                    const memberWhoCaught = await Member.getMemberDB(userWhoClicked.id, interaction.guild.id);
+                    const memberWhoCaught = await Member.getMemberDB(userWhoClicked.id, guild);
 
                     if (isProcessing) {
                         return;
@@ -132,7 +129,7 @@ module.exports = {
                     // Indiquez qu'une interaction est en cours de traitement
                     isProcessing = true;
 
-                    const caught = Member.catchMember(userSummoned, userWhoClicked, interaction.guild.id)
+                    const caught = Member.catchMember(userSummoned, userWhoClicked, guild)
 
                     if (caught) {
                         await interaction.update({
@@ -151,7 +148,7 @@ module.exports = {
                             components: []
                         });
 
-                        await Member.updateDateCatchUser(userWhoClicked.id, interaction.guild.id);
+                        await Member.updateDateCatchUser(userWhoClicked.id, guild);
                     }
                     isProcessing = false;
                 }

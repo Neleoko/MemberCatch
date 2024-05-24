@@ -1,6 +1,6 @@
 const { ButtonStyle, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, EmbedBuilder} = require('discord.js');
 const Member = require('../entity/member');
-
+const Guild = require('../entity/guild');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('givecoins')
@@ -18,8 +18,10 @@ module.exports = {
     async execute(interaction) {
         const memberToGive = interaction.options.getMember('user');
 
-        const memberInteractionDB = await Member.getMemberDB(interaction.user.id, interaction.guild.id);
-        const memberToGiveDB = await Member.getMemberDB(memberToGive.id, interaction.guild.id);
+        const guildDB = await Guild.getGuildById(interaction.guild.id);
+
+        const memberInteractionDB = await Member.getMemberDB(interaction.user.id, guildDB);
+        const memberToGiveDB = await Member.getMemberDB(memberToGive.id, guildDB);
 
         if (!memberInteractionDB) {
             return interaction.reply({ content: 'Vous n\'avez pas de profil', ephemeral: true });

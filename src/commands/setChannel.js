@@ -1,6 +1,5 @@
-
-const fs = require('fs');
-const path = require('path');
+const settingGuild = require("../entity/settingGuild");
+const Guild = require("../entity/guild");
 const {SlashCommandBuilder, PermissionsBitField } = require("discord.js");
 
 module.exports = {
@@ -21,34 +20,20 @@ module.exports = {
 
         // Vérifie si le canal existe
         const channel = interaction.guild.channels.cache.get(channelId);
+
         if (!channel) {
             return interaction.reply({ content: 'Ce canal n\'existe pas.', ephemeral: true });
         }
 
-        // Définit l'ID du canal dans le fichier JSON
-        fs.readFile(path.join(__dirname, '../serverConf.json'), 'utf8', (err, data) => {
-            if (err) {
-                console.error('Erreur de lecture du fichier :', err);
-                return;
-            }
+        const guildDB = await Guild.getGuildById(interaction.guildId); // Récupère le serveur
 
-            // Convertir le contenu en objet JavaScript
-            let jsonContent = JSON.parse(data);
+        try {
+            await settingGuild.setChannelCmd(guildDB, channelId); // Définit le canal pour le leveling
+            interaction.reply({ content: `Le canal pour le leveling a été défini à ${channel.name}.`, ephemeral: true });
+        } catch (error) {
+            console.error(error);
+            interaction.reply({ content: 'Une erreur est survenue lors de la définition du canal pour le leveling.', ephemeral: true });
+        }
 
-            // Modifier la valeur de la clé spécifique
-            jsonContent.channel.cmdID = channelId;
-
-            // Convertir l'objet JavaScript mis à jour en JSON
-            let updatedJson = JSON.stringify(jsonContent, null, 4);
-
-            // Écrire les modifications dans le fichier JSON
-            fs.writeFile(path.join(__dirname, '../serverConf.json'), updatedJson, 'utf8', (err) => {
-                if (err) {
-                    interaction.reply({ content: 'Erreur lors de l\'écriture du fichier.', ephemeral: true });
-                    return;
-                }
-                interaction.reply({ content: `Le canal pour le leveling a été défini à ${channel.name}.`, ephemeral: true });
-            });
-        });
     },
 };

@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle } = require('discord.js');
 const Member = require('../entity/member');
+const Guild = require('../entity/guild');
 const {getUserAvatarColor} = require("../utils/nodeVibrant");
 
 module.exports = {
@@ -8,11 +9,11 @@ module.exports = {
         .setDescription('Affiche l\'inventaire complet de tout les membres '),
     async execute(interaction, client) {
 
-
+        const guild = await Guild.getGuildById(interaction.guildId);
         // Récupère tous les membres capturés
         const members = await Member.find(
             {
-                serveur_id: interaction.guild.id
+                guildId: guild._id
             }
         );
         if (members.length === 0) {
@@ -20,9 +21,8 @@ module.exports = {
         }
 
         let currentIndex = 0;
-        let embed = new EmbedBuilder();
 
-        embed = await setEmbed(embed, members[currentIndex], client, currentIndex, members.length);
+        let embed = await setEmbed(members[currentIndex], client, currentIndex, members.length);
 
         const actionRow = new ActionRowBuilder()
             .addComponents(
@@ -47,7 +47,7 @@ module.exports = {
             } else if (interaction.customId === 'next') {
                 currentIndex = (currentIndex + 1) % members.length;
             }
-            embed = await setEmbed(embed, members[currentIndex], client, currentIndex, members.length);
+            embed = await setEmbed(members[currentIndex], client, currentIndex, members.length);
             await interaction.update({ embeds: [embed], components: [actionRow] });
         });
         collector.on('end', () => {
@@ -58,11 +58,11 @@ module.exports = {
 };
 
 
-async function setEmbed(embed, member, client, currentIndex, totalMembers){
+async function setEmbed(member, client, currentIndex, totalMembers){
     const memberCaughtDS = await client.users.fetch(member.username_id);
 
     const dominantColor = await getUserAvatarColor(memberCaughtDS.avatarURL({ extension: 'png', dynamic: true }));
-
+    const embed = new EmbedBuilder();
     embed.setTitle(memberCaughtDS.username)
         .addFields(
             { name: 'Niveau', value: member.level.toString() },

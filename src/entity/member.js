@@ -1,13 +1,13 @@
 const { model, Schema} = require('mongoose');
-const serverConf = require('../serverConf.json');
 
 const memberSchema = new Schema({
     username_id: {
         type: String,
         required: true
     },
-    serveur_id: {
-        type: String,
+    guildId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Guild',
         required: true
     },
     level: {
@@ -39,22 +39,25 @@ const memberSchema = new Schema({
     collection: 'members',
     versionKey: false,
     statics: {
-        getMemberDB: function (username_id, serveur_id) {
+        getAllMembers: function (guild) {
+            return this.find({ guildId: guild._id });
+        },
+        getMemberDB: function (username_id, guild) {
             return this.findOne(
                 {
                     username_id: username_id,
-                    serveur_id: serveur_id
+                    guildId: guild._id
                 }
                 );
         },
         getUserDiscord: function (username_id, client) {
             return client.users.cache.get(username_id);
         },
-        getRandomMember: async function (username_id, serveur_id) {
+        getRandomMember: async function (username_id, guild) {
             const result = await this.aggregate([
                 {
                     $match: {
-                        serveur_id: serveur_id,
+                        guildId: guild._id,
                         username_id: { $ne: username_id }
                     }
                 },
@@ -62,17 +65,21 @@ const memberSchema = new Schema({
             ]);
             return result[0];
         },
-        calculateNextLevelXP: function(currentLevel) {
-            return Math.floor(serverConf.level.baseXP * Math.pow(serverConf.level.ratio, currentLevel)); // XP nécessaire pour atteindre le niveau suivant
+        getMembersWasCapturedBy: function (capturedBy, guild) {
+            return this.find(
+                {
+                    capturedBy: capturedBy,
+                    guildId: guild._id
+                });
         },
-        addNewUser: function (member) {
+        addNewUser: function (member, guild) {
             const newMember = new this({
-                username_id: member.author.id,
-                serveur_id: member.guild.id,
+                username_id: member.id,
+                guildId: guild._id,
             });
             return newMember.save();
         },
-        addCoins: function (member, coins, serveur_id) {
+        addCoins: function (member, coins, guild) {
             const data = {
                 $inc: {
                     coins: coins
@@ -81,12 +88,12 @@ const memberSchema = new Schema({
 
             const filter = {
                 username_id: member.username_id,
-                serveur_id: serveur_id
+                guildId: guild._id,
             };
 
             return this.updateOne(filter, data);
         },
-        catchMember: async function (member, captor, serveur_id) {
+        catchMember: async function (member, captor, guild) {
             const data = {
                 $set: {
                     capturedBy: captor.id
@@ -95,12 +102,12 @@ const memberSchema = new Schema({
 
             const filter = {
                 username_id: member.username_id,
-                serveur_id: serveur_id
+                guildId: guild._id,
             };
 
             return await this.updateOne(filter, data);
         },
-        updateDateLastSummon: function (memberId, serveur_id) {
+        updateDateLastSummon: function (memberId, guild) {
             const data = {
                 $set: {
                     lastSummon: new Date()
@@ -109,12 +116,12 @@ const memberSchema = new Schema({
 
             const filter = {
                 username_id: memberId,
-                serveur_id: serveur_id
+                guildId: guild._id,
             };
 
             return this.updateOne(filter, data);
         },
-        updateDateCatchUser: function (memberId, serveur_id) {
+        updateDateCatchUser: function (memberId, guild) {
             const data = {
                 $set: {
                     lastCatch: new Date()
@@ -123,12 +130,12 @@ const memberSchema = new Schema({
 
             const filter = {
                 username_id: memberId,
-                serveur_id: serveur_id
+                guildId: guild._id,
             };
 
             return this.updateOne(filter, data);
         },
-        updateUserLevel: function (member, lvlUp, newXp, serveur_id) {
+        updateUserLevel: function (member, lvlUp, newXp, guild) {
             let newLevel;
             if (lvlUp === true) { // Si l'utilisateur a atteint le niveau suivant
                 newLevel = member.level + 1;
@@ -145,15 +152,15 @@ const memberSchema = new Schema({
 
             const filter = {
                 username_id: member.username_id,
-                serveur_id: serveur_id
+                guildId: guild._id,
             };
 
             return this.updateOne(filter, data);
         },
-        updateCapturedBy: function (memberID, capturedBy, serveur_id) {
+        updateCapturedBy: function (memberID, capturedBy, guild) {
             const filter = {
                 username_id: memberID,
-                serveur_id: serveur_id
+                guildId: guild._id,
             };
             const data = {
                 $set: {
@@ -163,10 +170,24 @@ const memberSchema = new Schema({
 
             return this.updateOne(filter, data);
         },
+        updateCoins: function (member, guild, coins) {
+            const data = {
+                $set: {
+                    coins: coins
+                }
+            };
+
+            const filter = {
+                username_id: member.username_id,
+                guildId: guild._id,
+            };
+
+            return this.updateOne(filter, data);
+        },
         findByName: function(name) {
             return this.find({ name: name });
         },
-        releaseMember: function (member, serveur_id) {
+        releaseMember: function (member, guild) {
             const data = {
                 $set: {
                     capturedBy: null
@@ -175,7 +196,7 @@ const memberSchema = new Schema({
 
             const filter = {
                 username_id: member.username_id,
-                serveur_id: serveur_id
+                guildId: guild._id,
             };
 
             return this.updateOne(filter, data);
