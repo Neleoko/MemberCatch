@@ -201,6 +201,14 @@ const memberSchema = new Schema({
 
             return this.updateOne(filter, data);
         },
+        deleteMemberDB: function (member, guild) {
+            return this.deleteOne(
+                {
+                    username_id: member.id,
+                    guildId: guild._id
+                }
+            );
+        },
     }
 });
 
