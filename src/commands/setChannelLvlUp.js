@@ -4,7 +4,7 @@ const {SlashCommandBuilder, PermissionsBitField } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('setchannel')
+        .setName('setchannellvlup')
         .setDescription('Définit le canal pour le leveling')
         .addStringOption(option =>
             option.setName('idchannel')
@@ -28,7 +28,7 @@ module.exports = {
         const guildDB = await Guild.getGuildById(interaction.guildId); // Récupère le serveur
 
         try {
-            await settingGuild.setChannelCmd(guildDB, channelId); // Définit le canal pour le leveling
+            await settingGuild.setChannelLvlUp(guildDB, channelId); // Définit le canal pour le leveling
             interaction.reply({ content: `Le canal pour le leveling a été défini à ${channel.name}.`, ephemeral: true });
         } catch (error) {
             console.error(error);

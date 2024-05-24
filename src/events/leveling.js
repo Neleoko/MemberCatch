@@ -32,7 +32,7 @@ module.exports = {
             const cumul = memberData.xp + gainXp;
             const neededXp = calculateNextLevelXP(memberData.level, settingGuild); // XP nécessaire pour atteindre le niveau suivant
 
-            const cmdChannel = message.guild.channels.cache.get(settingGuild.channelCmd);
+            const cmdChannel = message.guild.channels.cache.get(settingGuild.setChannelLvlUp);
 
             if (cumul >= neededXp) { // Si l'utilisateur a atteint le niveau suivant
                 const newXp = cumul - neededXp; // XP restant après avoir atteint le niveau suivant

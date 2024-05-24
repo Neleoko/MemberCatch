@@ -6,7 +6,7 @@ const settingGuildSchema = new Schema({
         ref: 'Guild',
         required: true
     },
-    channelCmd: {
+    channelLvlUp: {
         type: String,
         default: null
     },
@@ -47,10 +47,10 @@ const settingGuildSchema = new Schema({
             };
             return await this.updateOne(filter, data);
         },
-        async setChannelCmd(guild, channelCmd) {
+        async setChannelLvlUp(guild, ChannelLvlUp) {
             const data = {
                 $set:{
-                    channelCmd: channelCmd,
+                    channelLvlUp: ChannelLvlUp,
                 },
             };
             const filter = {
