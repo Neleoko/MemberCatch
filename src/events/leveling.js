@@ -28,7 +28,7 @@ module.exports = {
 
             memberData = await Member.getMemberDB(message.author.id, guildDB); // Récupère les données de l'utilisateur
 
-            const gainXp = Math.floor(Math.random() * 1) + 50; // Génère un nombre aléatoire entre 1 et 5
+            const gainXp = Math.floor(Math.random() * 1) + 5; // Génère un nombre aléatoire entre 1 et 5
             const cumul = memberData.xp + gainXp;
             const neededXp = calculateNextLevelXP(memberData.level, settingGuild); // XP nécessaire pour atteindre le niveau suivant
 

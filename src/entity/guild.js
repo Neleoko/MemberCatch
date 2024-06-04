@@ -19,7 +19,6 @@ const guildSchema = new Schema({
             return this.findOne({guildId});
         },
         async addNewGuild(guild) {
-            console.log("creating new guild in db");
             const newGuild = new this({
                 guildId: guild.id,
                 name: guild.name,
