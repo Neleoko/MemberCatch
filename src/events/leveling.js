@@ -28,12 +28,12 @@ module.exports = {
 
             memberData = await Member.getMemberDB(message.author.id, guildDB); // Récupère les données de l'utilisateur
 
-            const gainXp = Math.floor(Math.random() * 1) + 5; // Génère un nombre aléatoire entre 1 et 5
+            // const gainXp = Math.floor(Math.random() * 100) + 5; // Génération d'un nombre aléatoire entre 5 et 100
+            const gainXp = 100
             const cumul = memberData.xp + gainXp;
             const neededXp = calculateNextLevelXP(memberData.level, settingGuild); // XP nécessaire pour atteindre le niveau suivant
 
-            const cmdChannel = message.guild.channels.cache.get(settingGuild.setChannelLvlUp);
-
+            const cmdChannel = message.guild.channels.cache.get(settingGuild.channelLvlUp);
             if (cumul >= neededXp) { // Si l'utilisateur a atteint le niveau suivant
                 const newXp = cumul - neededXp; // XP restant après avoir atteint le niveau suivant
                 await Member.updateUserLevel(memberData, true, newXp, guildDB);
